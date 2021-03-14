@@ -1,9 +1,9 @@
 package com.challenge.GithubCrawler.controller;
 
 import com.challenge.GithubCrawler.model.HTML;
-import com.challenge.GithubCrawler.service.WebsiteHTMLRetrieverService;
+import com.challenge.GithubCrawler.service.HTMLParseService;
+import com.challenge.GithubCrawler.service.HTMLRetrieveService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +17,17 @@ import java.io.IOException;
 public class WebsiteCrawlerController {
 
     @Autowired
-    private WebsiteHTMLRetrieverService websiteHTMLRetriever;
+    private HTMLRetrieveService websiteHTMLRetriever;
+
+    @Autowired
+    private HTMLParseService htmlParseService;
 
     @GetMapping("/github-repository")
     public ResponseEntity<HTML> getMeasurement(@RequestParam(value = "url") String URL) throws IOException, InterruptedException {
 
-        return ResponseEntity.ok(this.websiteHTMLRetriever.retrieveHTMLFromWebsite(URL));
+        String htmlString = this.websiteHTMLRetriever.getHTMLFromWebsite(URL);
+
+        return ResponseEntity.ok(new HTML(this.htmlParseService.getAllLinksFromHTMLPage(htmlString)));
     }
 
 }
