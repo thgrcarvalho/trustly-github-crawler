@@ -1,19 +1,19 @@
 package com.challenge.GithubCrawler.model;
 
-import java.util.List;
+import java.util.Set;
 
 public class HTML {
-    private List<Link> links;
+    private Set<Link> links;
 
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
+    public HTML(Set<Link> links) {
         this.links = links;
     }
 
-    public HTML(List<Link> links) {
+    public Set<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(Set<Link> links) {
         this.links = links;
     }
 

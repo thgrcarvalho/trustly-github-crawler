@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-public class HTMLRetrieveService implements WebsiteRequestingService{
+public class HttpRequestService implements WebsiteRequestingService{
 
     @Autowired
-    FileHandlerService fileHandler;
+    ByteArrayHandlerService fileHandler;
 
     public String getHTMLFromWebsite(String URL) throws IOException {
         HttpEntity entity = this.getRequestToURL(URL);
@@ -28,6 +28,12 @@ public class HTMLRetrieveService implements WebsiteRequestingService{
         HttpEntity entity = this.getRequestToURL(URL);
 
         return this.fileHandler.createFileByteArrayFromEntity(entity);
+    }
+
+    public Boolean verifyIfFileIsTextFile(String URL) throws IOException {
+        HttpEntity entity = this.getRequestToURL(URL);
+
+        return entity.getContentType().toString().contains("text");
     }
 
     private HttpEntity getRequestToURL(String URL) throws IOException {
