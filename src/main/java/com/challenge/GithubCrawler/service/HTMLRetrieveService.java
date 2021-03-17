@@ -1,38 +1,46 @@
 package com.challenge.GithubCrawler.service;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 @Service
-public class HTMLRetrieveService implements WebsiteRequestService{
+public class HTMLRetrieveService implements WebsiteRequestingService{
 
-    public String getHTMLFromWebsite(String URL) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    @Autowired
+    FileHandlerService fileHandler;
 
-        HttpRequest request = this.generateHttpRequest(URL);
+    public String getHTMLFromWebsite(String URL) throws IOException {
+        HttpEntity entity = this.getRequestToURL(URL);
 
-        HttpResponse<String> response = this.getHTTPResponseFromClient(request, client);
-
-        return this.getHTMLTextFromBody(response);
+        return this.getHTMLTextFromBody(entity);
     }
 
-    private HttpRequest generateHttpRequest(String URL){
-        return HttpRequest.newBuilder()
-                .uri(URI.create(URL))
-                .GET()
-                .build();
+
+    public byte[] getFileFromURL(String URL) throws IOException {
+        HttpEntity entity = this.getRequestToURL(URL);
+
+        return this.fileHandler.createFileByteArrayFromEntity(entity);
     }
 
-    private HttpResponse getHTTPResponseFromClient(HttpRequest request, HttpClient client) throws IOException, InterruptedException {
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    private HttpEntity getRequestToURL(String URL) throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        HttpGet httpGet = new HttpGet(URL);
+
+        CloseableHttpResponse response = httpClient.execute(httpGet);
+
+        return response.getEntity();
     }
 
-    private String getHTMLTextFromBody(HttpResponse<String> response){
-        return response.body();
+    private String getHTMLTextFromBody(HttpEntity entity) throws IOException {
+        return EntityUtils.toString(entity, "UTF-8");
     }
 }
