@@ -10,11 +10,9 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class ByteArrayHandlerService implements FileHandlingService{
-
-    @Autowired
-    private ByteArrayOutputStream outputStream;
-
     public byte[] createFileByteArrayFromEntity(HttpEntity entity) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         entity.writeTo(outputStream);
 
         return outputStream.toByteArray();
@@ -28,6 +26,10 @@ public class ByteArrayHandlerService implements FileHandlingService{
         String fileText = this.convertTextFileToString(file);
 
         return fileText.split("\\R").length;
+    }
+
+    public String getFileExtensionFromURL(String URL){
+        return URL.contains(".") ? URL.substring(URL.lastIndexOf(".") + 1) : "";
     }
 
     private String convertTextFileToString(byte[] file){

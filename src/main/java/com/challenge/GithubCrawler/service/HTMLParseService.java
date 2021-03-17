@@ -3,8 +3,9 @@ package com.challenge.GithubCrawler.service;
 import com.challenge.GithubCrawler.model.Link;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class HTMLParseService extends MarkupLanguageParsingService{
@@ -14,9 +15,9 @@ public class HTMLParseService extends MarkupLanguageParsingService{
     private static final String LINK_END = "/a>";
     private static final String HREF_NAME = "href";
 
-    public List<Link> getAllLinksFromHTMLPage(String html){
+    public Set<Link> getAllLinksFromHTMLPage(String html){
         String htmlBody = this.getHTMLBody(html);
-        ArrayList<Link> links = new ArrayList<>();
+        HashSet<Link> links = new HashSet<>();
 
         while(this.checkIfHTMLBodyHasLink(htmlBody)){
             htmlBody = processLinkFromHTMLBody(htmlBody, links);
@@ -45,7 +46,7 @@ public class HTMLParseService extends MarkupLanguageParsingService{
         return super.getFirstAttributeOccurrence(link, HREF_NAME);
     }
 
-    private String processLinkFromHTMLBody(String htmlBody, List<Link> links){
+    private String processLinkFromHTMLBody(String htmlBody, Set<Link> links){
         String htmlLink = this.getFirstLinkFromHTML(htmlBody);
 
         Link link = this.generateLinkFromHTML(htmlLink);

@@ -4,6 +4,7 @@ public abstract class MarkupLanguageParsingService {
     private static final String ATTR_VALUE_START = "=\"";
     private static final String ATTR_VALUE_END="\"";
 
+
     public String getFirstTagOccurrence(String text, String tagStart, String tagEnd){
         String cleanText = this.removingLineBreaks(text);
         Integer tagEndSize = tagEnd.length();
@@ -17,6 +18,10 @@ public abstract class MarkupLanguageParsingService {
     public String getFirstAttributeOccurrence(String text, String attrName){
         String cleanText = this.removingLineBreaks(text);
         Integer indexOfAttrStart = cleanText.indexOf(attrName);
+
+        if(!cleanText.contains(attrName)){
+            return attrName.concat(ATTR_VALUE_START).concat(ATTR_VALUE_END);
+        }
 
         return cleanText.substring(
                 indexOfAttrStart,
