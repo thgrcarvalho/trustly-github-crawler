@@ -14,7 +14,7 @@ Obs: If you want to run the application without docker, after step 1, run the fo
 
 ## Using the API:
 
-After the application is installed and running, you can make HTTP Post request to the following endpoint: `http://SERVER_URL/8080/crawler/github-repository?url=GITHUB_REPO&branch=REPO_BRANCH`
+After the application is installed and running, you can make HTTP GET request to the following endpoint: `http://SERVER_URL/8080/crawler/github-repository?url=GITHUB_REPO&branch=REPO_BRANCH`
 
 The URL variable are as follows:
 * SERVER_URL: The server where is app is hosted;
