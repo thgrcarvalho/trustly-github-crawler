@@ -2,6 +2,7 @@ package com.challenge.GithubCrawler.service;
 
 import com.challenge.GithubCrawler.model.FileExtensionData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class GithubRepoScraper implements GitRepositoryScraper{
     @Autowired
     private PageAndFileProcessingService pageAndFileProcessor;
 
+    @Cacheable(value = "githubScrapper", key = "{#URL, #branch}")
     public Map<String, FileExtensionData> processRepository(String URL, String branch) throws IOException, ExecutionException, InterruptedException {
         this.initiateVariables(URL, branch);
 
