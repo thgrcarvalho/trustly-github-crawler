@@ -11,6 +11,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Service Class with the main service of the API.
+ *
+ * @version 1.0
+ *
+ * @author Thiago Carvalho
+ *
+ */
 @Service
 public class GithubRepoScraper implements GitRepositoryScraper{
 
@@ -30,6 +38,15 @@ public class GithubRepoScraper implements GitRepositoryScraper{
     @Autowired
     private PageAndFileProcessingService pageAndFileProcessor;
 
+    /**
+     *
+     * @param URL Github repository main page.
+     * @param branch Repository branch that will be used the retrieve the files data.
+     * @return Map associating the file extension with the corresponding total line count and size in bytes.
+     * @throws IOException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     @Cacheable(value = "githubScrapper", key = "{#URL, #branch}")
     public Map<String, FileExtensionData> processRepository(String URL, String branch) throws IOException, ExecutionException, InterruptedException {
         this.initiateVariables(URL, branch);
@@ -77,6 +94,11 @@ public class GithubRepoScraper implements GitRepositoryScraper{
         return URL_DEPTH_SEPARATOR;
     }
 
+    /**
+     *
+     * @param URL Github repository main page.
+     * @param branch Repository branch that will be used the retrieve the files data.
+     */
     private void initiateVariables(String URL, String branch){
         this.projectName = this.getProjectNameFromURL(URL);
         this.branch = branch;

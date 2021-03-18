@@ -16,6 +16,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+/**
+ * Service Class that is responsible for processing the folders and files discovered by the API.
+ *
+ * @version 1.0
+ *
+ * @author Thiago Carvalho
+ *
+ */
 @Service
 public class PageAndFileProcessorService implements PageAndFileProcessingService{
     @Autowired
@@ -34,6 +42,15 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
     @Autowired
     private LinkProcessingService LinkProcessor;
 
+    /**
+     * Function responsible for processing a repository folder.
+     *
+     * @param URL Folder URL found by the scraping process.
+     * @return This function is responsible only for processing the URL. Nothing is returned.
+     * @throws IOException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     @Async("asyncExecutor")
     public CompletableFuture<Void> processPage(String URL) throws IOException, ExecutionException, InterruptedException {
 
@@ -46,11 +63,21 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         return null;
     }
 
+    /**
+     * Function responsible for processing a repository textFile.
+     *
+     * @param link File URL found by the scraping process.
+     * @return This function is responsible only for processing the URL. Nothing is returned.
+     * @throws IOException
+     */
     @Async("asyncExecutor")
     public CompletableFuture<Void> processFileFromURL(Link link) throws IOException {
 
         String linkURL = this.generateRawFileURL(link);
 
+        /**
+         * Only text files should be analysed.
+         */
         if(!this.websiteHTMLRetriever.verifyIfFileIsTextFile(linkURL))
             return null;
 
@@ -67,6 +94,13 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         return null;
     }
 
+    /**
+     * Function responsible for generating an object with all useful links of a give folder page.
+     *
+     * @param URL The URL from the requested HTML website.
+     * @return An Object with all the useful links for the API.
+     * @throws IOException
+     */
     private HTML getHTMLFromURL(String URL) throws IOException {
         String htmlString = this.websiteHTMLRetriever.getHTMLFromWebsite(
                 this.generateLinkPageURL(URL)
@@ -79,6 +113,15 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         );
     }
 
+    /**
+     * Function responsible for sending the request to process all links found in a page.
+     *
+     * @param links Page links that need to be processed.
+     * @return This function is responsible only for processing the URL. Nothing is returned.
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws IOException
+     */
     private CompletableFuture<Void> sendAllLinksRequestProcess(Set<Link> links) throws InterruptedException, ExecutionException, IOException {
         ArrayList<CompletableFuture<Void>> linksReady = new ArrayList<>();
 
@@ -89,10 +132,22 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         return CompletableFuture.allOf(linksReady.toArray(new CompletableFuture[linksReady.size()]));
     }
 
+    /**
+     * Function that removes all non useful links on a page.
+     *
+     * @param links List of links that need to be filtered.
+     * @return Filtered list of links based on the API requirements.
+     */
     private Set<Link> removeUnwantedLinksMainRepoPage(Set<Link> links) {
         return links.stream().filter(this::checkIfRepoMainPageLink).collect(Collectors.toSet());
     }
 
+    /**
+     * Verifies if a link belongs the to the requested repository.
+     *
+     * @param link Link to be verified.
+     * @return The result of the verification.
+     */
     private Boolean checkIfRepoMainPageLink(Link link) {
         if (this.verifyRepoMainPageLinksRestrictions(link))
             return false;
@@ -100,6 +155,13 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         return link.getHref().substring(0, this.githubRepoScraper.getProjectName().length()).equals(this.githubRepoScraper.getProjectName());
     }
 
+    /**
+     * Function that makes all the restrictions necessary to ensure that a folder page belongs to the requested
+     * repository.
+     *
+     * @param link Folder page link to be verified.
+     * @return The result of the verification.
+     */
     private Boolean verifyRepoMainPageLinksRestrictions(Link link) {
         if (!link.getHref().contains(this.githubRepoScraper.getUrlDepthSeparator()))
             return true;
@@ -116,20 +178,33 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         return false;
     }
 
+    /**
+     * Function responsible for concatenating the repository name with a given link.
+     *
+     * @param link The link to be concatenated.
+     * @return The full URL of the requested File.
+     */
     private String generateRawFileURL(Link link){
         String blobString = this.githubRepoScraper.getGithubRawFileDomain().concat(link.getHref());
 
         return blobString.replace("/".concat(this.githubRepoScraper.getGithubFileType()), "");
     }
 
+    /**
+     * Function that generate the full URL of a given visited link.
+     *
+     * @param pageURL Page URL.
+     * @return Full URL of the requested Page.
+     */
     private String generateLinkPageURL(String pageURL){
         return this.githubRepoScraper.getGithubDomain().concat(pageURL);
     }
 
-    public void addVisitedLink(String URL){
-        this.githubRepoScraper.getVisitedLinks().add(URL);
-    }
-
+    /**
+     * Function responsible for saving the data retrieved from the github text file.
+     *
+     * @param textFile An object that represents the text file.
+     */
     private void addVisitedFileLinesAndSize(TextFile textFile){
         if(!this.githubRepoScraper.getFileExtensionData().containsKey(textFile.getFileExtension()))
             this.instantiateFileExtensionDataOnMap(textFile);
@@ -137,6 +212,11 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         this.updateFileExtensionDataValues(textFile);
     }
 
+    /**
+     * Function that instantiate the FileExtensionData object used on the HashMap.
+     *
+     * @param textFile Text file associated to the file extension.
+     */
     private void instantiateFileExtensionDataOnMap(TextFile textFile){
         this.githubRepoScraper.getFileExtensionData().put(
                 textFile.getFileExtension(),
@@ -148,6 +228,11 @@ public class PageAndFileProcessorService implements PageAndFileProcessingService
         );
     }
 
+    /**
+     * Function that update the data associated with the processed text file.
+     *
+     * @param textFile An object that represents the text file.
+     */
     private void updateFileExtensionDataValues(TextFile textFile){
         FileExtensionData fileData = this.githubRepoScraper.getFileExtensionData().get(textFile.getFileExtension());
 
