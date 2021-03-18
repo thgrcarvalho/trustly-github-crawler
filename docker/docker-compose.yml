@@ -1,0 +1,8 @@
+services:
+  github-scraper:
+    container_name: githubScraper
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile    
+    ports:
+      - "8080:8080"
