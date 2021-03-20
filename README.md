@@ -10,7 +10,7 @@
 1. On the root project folder, compile the application with the following command: `mvn clean install`
 1. Run the following docker-compose command to build the image and deploy a container with the app (from also the root project folder): `docker-compose -f docker/docker-compose up -d`
 
-Obs: If you want to run the application without docker, after step 1, run the following command (from also the root project folder): `java -Djdk.tls.client.protocols=TLSv1.2 -jar target/GithubCrawler-0.0.1-SNAPSHOT.jar`
+Obs: If you want to run the application without docker, after step 1, run the following command (from also the root project folder): `java -Djdk.tls.client.protocols=TLSv1.1,TLSv1.2 -jar target/GithubCrawler-0.0.1-SNAPSHOT.jar`
 
 ## Using the API:
 
